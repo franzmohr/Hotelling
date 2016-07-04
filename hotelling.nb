@@ -3,7 +3,7 @@ Clear["Global`*"];
 (* Enter information here *)
 \[Theta] ={0,.6,1}; (* Initial positions of firms *)
 ent=0; (* Specification of entrant (\[Theta],firm). Set to 0 if there is no entrant. *)
-(*ent = {.3,3}; (* Firm 3 places prodect at position .3 *)*)
+(*ent = {.3,3}; (* Firm 3 places product at position .3 *)*)
 mc = 10; (* Marginal costs assumed to be the same over all firms. If not provide a list of MCs, e.g. mc={20,10,4,50} in the case of 4 products. *)
 
 (* Solution *)
