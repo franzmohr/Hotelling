@@ -1,0 +1,89 @@
+Clear["Global`*"];
+
+(*Given data*)
+\[Theta] = {0, .2, .5, 1};(*Initial positions of firms*)
+
+ent = {.8, 1};(*Specification of entrant (\[Theta],firm)*)
+
+mc = 10;(*Marginal costs*)
+\[Theta]total = 
+  Sort[Prepend[\[Theta], 
+    ent[[1]]]];(*Add position of entrant to the market*)
+firm = {};
+For[i = 1, i < Length[\[Theta]total], i++, 
+  If[ent[[2]] == i, 
+   firm = Append[firm, {i, Append[{\[Theta][[i]]}, ent[[1]]]}], 
+   firm = Append[firm, {i, {\[Theta][[i]]}}]]];
+If[Length[mc] == 0, mc = Table[mc, Length[\[Theta]total]], 
+  mc = mc];(*Allows for different marginal costs.If only one value is \
+provided,all firms are assumed to have the same costs.*)(*Derive \
+conditions for indifferent individuals (r)*)
+equ = {}; solveequ = {};
+For[i = 2, i <= Length[\[Theta]total], i++, 
+ equ = Append[equ, 
+   V - ToExpression["p" <> ToString[i - 1]] - 
+     100*(ToExpression[
+         "r" <> ToString[i - 1]] - \[Theta]total[[i - 1]]) == 
+    V - ToExpression["p" <> ToString[i]] - 
+     100*(\[Theta]total[[i]] - 
+        ToExpression["r" <> ToString[i - 1]])];
+ solveequ = Append[solveequ, ToExpression["r" <> ToString[i - 1]]]]
+r = Flatten[Solve[equ, solveequ]];
+(*Derive quantity conditions*)
+q = {100*r1};
+For[i = 2, i < Length[\[Theta]total], i++, 
+ q = Append[q, 
+   100*(ToExpression["r" <> ToString[i]] - 
+      ToExpression["r" <> ToString[i - 1]])]]
+q = Append[q, 100*(1 - ToExpression["r" <> ToString[i - 1]])];
+q = q /. r;
+(*Derive profit functions for each firm*)
+profitequ = {}; \
+solveprofitequ = {};
+For[i = 1, i <= Length[firm], i++, firmequ = "";
+ For[j = 1, j <= Length[firm[[i]][[2]]], j++, 
+  pos = Flatten[Position[\[Theta]total, firm[[i]][[2]][[j]]]][[1]];
+  If[j == 1, 
+   firmequ = 
+    firmequ <> 
+     ToString[(ToExpression["p" <> ToString[pos]] - mc[[pos]])*
+       q[[pos]]], 
+   firmequ = 
+    firmequ <> "+" <> 
+     ToString[(ToExpression["p" <> ToString[pos]] - mc[[pos]])*
+       q[[pos]]]]];
+ firmequ = ToExpression[firmequ];
+ (*Derive profit maximizing conditions for each firm*)
+ For[j = 1, j <= Length[firm[[i]][[2]]], j++, 
+  pos = Flatten[Position[\[Theta]total, firm[[i]][[2]][[j]]]][[1]];
+  profitequ = 
+   Append[profitequ, 
+    D[firmequ, ToExpression["p" <> ToString[pos]]] == 0];
+  solveprofitequ = 
+   Append[solveprofitequ, ToExpression["p" <> ToString[pos]]];];]
+(*Solve the system for the price of each firm*)
+
+prices = Sort[Flatten[Solve[profitequ, solveprofitequ]]];
+r = solveequ /. r /. prices;
+r0 = Prepend[r, 0];
+r1 = Append[r, 1];
+q = q /. prices;
+prices = Sort[solveprofitequ] /. prices;
+share = q/Total[q];
+(*Give output*)
+
+output = {Prepend[Table[i, {i, 1, Length[\[Theta]total]}], "Firm"], 
+   Prepend[prices, "P"], Prepend[q, "Q"], 
+   Prepend[\[Theta]total, "\[Theta]"], Prepend[prices*q, "Profit"], 
+   Prepend[share, "Market Share"], Prepend[r0, "Lower indifferent"], 
+   Prepend[r1, "Upper indifferent"]};
+Grid[Transpose[output], Alignment -> Right]
+
+(*Illustration*)
+graph = {{{0, 20}, {100, 20}}};
+For[i = 2, i <= Length[output[[4]]], i++, 
+ graph = Append[
+   graph, {{100*output[[7]][[i]], 20}, {100*output[[4]][[i]], 0}}];
+ graph = Append[
+   graph, {{100*output[[4]][[i]], 0}, {100*output[[8]][[i]], 20}}]]
+Graphics[Line[graph], ImageSize -> 600]
