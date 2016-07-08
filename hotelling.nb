@@ -1,3 +1,4 @@
+(*Franz X. Mohr 2016*)
 Clear["Global`*"];
 
 Hotelling[\[Theta]0_,ent0_,mc0_,market0_]:=
