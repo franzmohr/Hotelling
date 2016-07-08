@@ -1,15 +1,10 @@
 Clear["Global`*"];
 
-(* Enter information here *)
-\[Theta] ={0,.6,1}; (* Initial positions of firms *)
-ent=0; (* Specification of entrant (\[Theta],firm). Set to 0 if there is no entrant. *)
-(*ent = {.3,3}; (* Firm 3 places product at position .3 *)*)
-mc = 10; (* Marginal costs assumed to be the same over all firms. If not provide a list of MCs, e.g. mc={20,10,4,50} in the case of 4 products. *)
-
-(* Solution *)
+Hotelling[\[Theta]0_,ent0_,mc0_,market0_]:=
+Block[{\[Theta]=\[Theta]0,ent=ent0,mc=mc0,market=market0,firm,i,\[Theta]total,equ,solveequ,V,r,q,profitequ,solveprofitequ,firmequ,pos,j,prices,r0,r1,share,output,graph},
 If[Length[ent]==0,\[Theta]total =\[Theta],\[Theta]total =Sort[Prepend[\[Theta],ent[[1]]]]]; (* Product positions after entrant *)
-firm = {}; (* Specify which firm produces which product *)
-If[Length[ent]==0,
+firm={};
+If[Length[ent]==0,(* Specify which firm produces which product *)
 For[i=1,i<=Length[\[Theta]total],i++,
 firm = Append[firm,{i,{\[Theta][[i]]}}]
 ],
@@ -20,24 +15,23 @@ firm = Append[firm,{i,{\[Theta][[i]]}}]
 ]
 ]
 ];
-If[Length[mc]==0,mc=Table[mc,Length[\[Theta]total]],mc =mc];(* Allows for different marginal costs. If only one value is provided, all firms are assumed to have the same costs. *)
-
+If[Length[mc]==0,mc=Table[mc,Length[\[Theta]total]],mc =mc];
+(* Allows for different marginal costs. If only one value is provided, all firms are assumed to have the same costs. *)
 (* Derive conditions for indifferent individuals *)
 equ={};solveequ={};
-For[i =2,i<=Length[\[Theta]total],i++,
-equ = Append[equ,V-ToExpression["p"<>ToString[i-1]]-100*(ToExpression["r"<>ToString[i-1]]-\[Theta]total[[i-1]])==V-ToExpression["p"<>ToString[i]]-100*(\[Theta]total[[i]]-ToExpression["r"<>ToString[i-1]])];
+i=2;
+For[i=2,i<=Length[\[Theta]total],i++,
+equ = Append[equ,V-ToExpression["p"<>ToString[i-1]]-market*(ToExpression["r"<>ToString[i-1]]-\[Theta]total[[i-1]])==V-ToExpression["p"<>ToString[i]]-market*(\[Theta]total[[i]]-ToExpression["r"<>ToString[i-1]])];
 solveequ = Append[solveequ,ToExpression["r"<>ToString[i-1]]]
-]
+];
 r =Flatten[Solve[equ,solveequ]];
-
 (* Derive quantity conditions *)
-q ={100*r1};
+q ={market*r1};
 For[i =2,i<Length[\[Theta]total],i++,
-q =Append[q,100*(ToExpression["r"<>ToString[i]]-ToExpression["r"<>ToString[i-1]])]
-]
-q=Append[q,100*(1-ToExpression["r"<>ToString[i-1]])];
+q =Append[q,market*(ToExpression["r"<>ToString[i]]-ToExpression["r"<>ToString[i-1]])]
+];
+q=Append[q,market*(1-ToExpression["r"<>ToString[i-1]])];
 q=q/.r;
-
 (* Derive profit functions for each firm*)
 profitequ={};solveprofitequ={};
 For[i=1,i<=Length[firm],i++, (* For each firm... *)
@@ -47,7 +41,7 @@ pos =Flatten[Position[\[Theta]total,firm[[i]][[2]][[j]]]][[1]];
 If[j==1,
 firmequ = firmequ<>ToString[(ToExpression["p"<>ToString[pos]]-mc[[pos]])*q[[pos]]],
 firmequ = firmequ<>"+"<>ToString[(ToExpression["p"<>ToString[pos]]-mc[[pos]])*q[[pos]]]
-]
+];
 ];
 firmequ = ToExpression[firmequ];
 
@@ -57,8 +51,7 @@ pos =Flatten[Position[\[Theta]total,firm[[i]][[2]][[j]]]][[1]]; (* First derivat
 profitequ = Append[profitequ,D[firmequ,ToExpression["p"<>ToString[pos]]]==0];
 solveprofitequ = Append[solveprofitequ,ToExpression["p"<>ToString[pos]]];
 ];
-]
-
+];
 (* Solve the system for the price of each firm*)
 prices =Sort[Flatten[Solve[profitequ,solveprofitequ]]];
 (* Calculate other variables by substition of the prices *)
@@ -70,7 +63,7 @@ prices=Sort[solveprofitequ]/.prices;
 share = q/Total[q];
 
 (* Give summarised output *)
-output={Prepend[Table[i,{i,1,Length[\[Theta]total]}],"Firm"],
+output={Prepend[Table[i,{i,1,Length[\[Theta]total]}],"Product"],
 Prepend[prices,"P"],
 Prepend[q,"Q"],
 Prepend[\[Theta]total,"\[Theta]"],
@@ -78,12 +71,13 @@ Prepend[prices*q,"Profit"],
 Prepend[share,"Market Share"],
 Prepend[r0,"Lower indifferent"],
 Prepend[r1,"Upper indifferent"]};
-Grid[ Transpose[output],Alignment->Right]
 
 (* Illustration *)
-graph={{{0,20},{100,20}}};
+graph={{{0,market*.2},{market,market*.2}}};
 For[i=2,i<=Length[output[[4]]],i++,
-graph=Append[graph,{{100*output[[7]][[i]],20},{100*output[[4]][[i]],0}}];
-graph=Append[graph,{{100*output[[8]][[i]],20},{100*output[[4]][[i]],0}}]
+graph=Append[graph,{{market*output[[7]][[i]],market*.2},{market*output[[4]][[i]],0}}];
+graph=Append[graph,{{market*output[[8]][[i]],market*.2},{market*output[[4]][[i]],0}}]
+];
+Print[Grid[ Transpose[output],Alignment->Right]];
+Print[Graphics[Line[graph],ImageSize->600]]
 ]
-Graphics[Line[graph],ImageSize->600]
