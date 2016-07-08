@@ -1,4 +1,4 @@
-# Solving Linear Hotelling Models in Wolfram Mathematica
+# Solving Hotelling Models in Wolfram Mathematica
 ## Description
 The file <code>notebook.nb</code> contains the functions <code>Hotelling</code> which solves some linear Hotelling models. Currently, the function allows for
 - multiple initial product positions,
@@ -6,7 +6,7 @@ The file <code>notebook.nb</code> contains the functions <code>Hotelling</code> 
 - different (constant) marginal costs of each firm,
 - different market sizes.
 
-The individual demand schedules are restricted to a negative one-by-one relation between price and demand and a negative one-by-one relation between demand and preference distance for each product.
+So far, only linear models are considered. The individual demand schedules are restricted to a negative one-by-one relation between price and demand and a negative one-by-one relation between demand and preference distance for each product.
 
 ## Setup
 The function <code>Hotelling[positions,entrant,MC,market]</code> requires to enter four starting values:
