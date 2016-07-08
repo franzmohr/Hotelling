@@ -8,7 +8,7 @@ The file <code>notebook.nb</code> contains the functions <code>Hotelling</code> 
 
 So far, only linear models are considered. The individual demand schedules are restricted to a negative one-by-one relation between price and demand and a negative one-by-one relation between demand and preference distance for each product.
 
-## Setup
+## Usage
 The function <code>Hotelling[positions,entrant,MC,market]</code> requires to enter four starting values:
 - <code>position</code> specifies the initial product positions. They have to be entered as a list that contains values of the range [0,1], e.g. <code>{0,.6,1}</code>.
 - <code>entrant</code> specifies the position of a new product g that is introduced by an already existing producer n. This is entered as a list of the form <code>{g,n}</code>. If <code>entrant</code> is set to zero, the solution will be obtained for the firms specifiey in <code>position</code> only.
