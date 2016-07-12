@@ -1,6 +1,6 @@
 # Solving Hotelling Models in Wolfram Mathematica
 ## Description
-The file <code>notebook.nb</code> contains the functions <code>Hotelling</code> which solves some linear Hotelling models. Currently, the function allows for
+The file <code>hotelling.nb</code> contains the functions <code>Hotelling</code> which solves some linear Hotelling models. Currently, the function allows for
 - multiple initial product positions,
 - entrance of a product at an arbitrary position of an arbitrary firm,
 - different (constant) marginal costs of each firm,
