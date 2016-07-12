@@ -79,6 +79,5 @@ For[i=2,i<=Length[output[[4]]],i++,
 graph=Append[graph,{{market*output[[7]][[i]],market*.2},{market*output[[4]][[i]],0}}];
 graph=Append[graph,{{market*output[[8]][[i]],market*.2},{market*output[[4]][[i]],0}}]
 ];
-Print[Grid[ Transpose[output],Alignment->Right]];
-Print[Graphics[Line[graph],ImageSize->600]]
+Return[{Grid[ Transpose[output],Alignment->Right],Graphics[Line[graph],ImageSize->600]}];
 ]
